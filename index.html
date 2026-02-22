@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RPSLS Super Ultra v12.7 - Neon Boxes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="rock.css">
+</head>
+<body>
+
+    <div id="flash"></div>
+    <!-- Moving Boxes Canvas Background -->
+    <canvas id="bg-canvas"></canvas>
+    <!-- Particle Effects Canvas -->
+    <canvas id="fx-canvas"></canvas>
+
+    <!-- LEFT SIDE INTELLIGENCE -->
+    <div class="side-wing wing-l hidden xl:flex">
+        <div class="wing-header">Protocol_Registry</div>
+        <div class="protocol-log" id="protocol-log">
+            <div class="log-item">> SESSION ENCRYPTED</div>
+            <div class="log-item">> AI ENGINE READY</div>
+        </div>
+        <div class="hud-panel p-3 rounded-xl border-l-4 border-l-cyan-500">
+            <div class="text-[7px] text-gray-500 uppercase tracking-widest mb-2">Neural_Analysis_Freq</div>
+            <div class="flex gap-1 h-8 items-end">
+                <div class="flex-1 bg-cyan-500/20 h-3"></div>
+                <div class="flex-1 bg-cyan-500/20 h-5"></div>
+                <div class="flex-1 bg-cyan-500/60 h-2"></div>
+                <div class="flex-1 bg-cyan-500 h-7 shadow-[0_0_10px_#00ffff]"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDE INTELLIGENCE -->
+    <div class="side-wing wing-r hidden xl:flex">
+        <div class="wing-header">AI_Core_Load</div>
+        <div class="hud-panel flex-1 rounded-2xl flex flex-col p-2">
+            <div class="flex flex-1 items-end gap-1 p-2" id="spectrum"></div>
+            <div
+                class="p-2 border-t border-cyan-500/30 text-[7px] text-pink-500 font-bold tracking-[0.2em] text-center uppercase">
+                Spectrum_Active
+            </div>
+        </div>
+        <div class="hud-panel p-3 rounded-xl text-center border-r-4 border-r-pink-500">
+            <div class="text-[7px] text-gray-500 uppercase tracking-widest mb-1">System_Uptime</div>
+            <div id="uptime" class="text-[10px] font-mono text-cyan-400">00:00:00</div>
+        </div>
+    </div>
+
+    <!-- FULL HEIGHT DYNAMIC WRAPPER -->
+    <div class="w-full max-w-4xl h-[98vh] relative z-10 flex flex-col items-center justify-between py-2 sm:py-4 px-2">
+
+        <!-- HEADER -->
+        <header class="flex flex-col items-center shrink-0">
+            <h1
+                class="text-xl sm:text-3xl lg:text-4xl font-black italic tracking-[0.1em] mb-2 uppercase flex gap-2 sm:gap-3">
+                <span class="neon-pink">Rock</span>
+                <span class="neon-blue">Paper</span>
+                <span class="neon-yellow">Scissors</span>
+                <span class="neon-green">Lizard</span>
+                <span class="neon-purple">Spock</span>
+            </h1>
+            <div class="flex items-center gap-3 hud-panel px-4 py-1 rounded-full border border-cyan-500/30">
+                <button onclick="toggleAI()" id="ai-btn"
+                    class="text-[8px] font-black text-cyan-400 tracking-[0.3em] hover:text-white uppercase transition-colors">Tactical_AI</button>
+                <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#00ffff]"></div>
+            </div>
+        </header>
+
+        <!-- SCORE HUD -->
+        <div
+            class="w-full max-w-2xl hud-panel rounded-[2rem] p-4 sm:p-5 flex justify-between items-center relative border-b-2 border-cyan-500 shadow-xl shrink-0">
+            <div
+                class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-30">
+            </div>
+
+            <div class="text-left flex flex-col pl-2 sm:pl-4">
+                <span
+                    class="text-lg sm:text-xl font-black text-cyan-400 uppercase tracking-[0.2em] drop-shadow-[0_0_12px_#00ffff]">YOU</span>
+                <span id="player-score" class="text-4xl sm:text-5xl font-black mt-1 leading-none">0</span>
+            </div>
+
+            <div class="flex flex-col items-center">
+                <div id="streak-hud" class="opacity-0 transition-all scale-75 -translate-y-1">
+                    <span
+                        class="bg-pink-500 text-black px-3 py-0.5 rounded-sm text-[8px] sm:text-[10px] font-black tracking-widest shadow-[0_0_20px_#ff0055] uppercase italic">Streak:
+                        <span id="streak-val">0</span></span>
+                </div>
+                <div class="flex items-center gap-4 sm:gap-8 mt-1">
+                    <button id="btn-profile" onclick="toggleStats()" class="control-btn">
+                        <svg viewBox="0 0 24 24" class="w-6 h-6 sm:w-7 sm:h-7 fill-current">
+                            <path
+                                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
+                    </button>
+                    <button id="mute-btn" onclick="toggleMute()" class="control-btn">
+                        <svg id="mute-icon" viewBox="0 0 24 24" class="w-6 h-6 sm:w-7 sm:h-7 fill-current">
+                            <path
+                                d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-right flex flex-col pr-2 sm:pr-4">
+                <span
+                    class="text-lg sm:text-xl font-black text-pink-500 uppercase tracking-[0.2em] drop-shadow-[0_0_12px_#ff0055]">AI</span>
+                <span id="computer-score" class="text-4xl sm:text-5xl font-black mt-1 leading-none">0</span>
+            </div>
+        </div>
+
+        <!-- ARENA TERMINAL (Flexible Height) -->
+        <div id="arena"
+            class="display-box w-full max-w-2xl rounded-[2.5rem] p-4 sm:p-6 flex-1 min-h-[180px] max-h-[35vh] flex flex-col items-center justify-center overflow-hidden border border-cyan-500/20 relative arena-float my-2 sm:my-4">
+            <div class="arena-floor"></div>
+            <div id="impact-wave" class="shockwave"></div>
+
+            <div class="text-center z-20 mb-4 sm:mb-6">
+                <h2 id="res-text"
+                    class="text-xl sm:text-3xl lg:text-4xl font-black uppercase tracking-[0.4em] text-white/90">
+                    NEURAL_READY</h2>
+                <p id="rea-text"
+                    class="text-[9px] sm:text-[11px] text-cyan-400 font-bold tracking-[0.5em] mt-1 sm:mt-2 uppercase italic h-4">
+                </p>
+            </div>
+
+            <div class="flex justify-between items-center w-full px-8 sm:px-20 relative z-10">
+                <div id="p-disp"
+                    class="w-20 h-20 sm:w-36 sm:h-36 flex items-center justify-center transition-all duration-300">
+                </div>
+                <div class="opacity-50 text-[8px] sm:text-[10px] font-black tracking-[1em] italic text-cyan-400">VS
+                </div>
+                <div id="c-disp"
+                    class="w-20 h-20 sm:w-36 sm:h-36 flex items-center justify-center transform scale-x-[-1] transition-all duration-300">
+                </div>
+            </div>
+
+            <div class="waveform hidden sm:flex" id="neural-wave"></div>
+        </div>
+
+        <!-- COMMAND CONSOLE -->
+        <div class="grid grid-cols-5 gap-2 sm:gap-4 w-full max-w-lg shrink-0 px-2">
+            <button onmouseenter="hSfx()" onclick="playRound('rock')"
+                class="choice-btn group aspect-square rounded-2xl flex items-center justify-center p-0 text-pink-500 shadow-xl overflow-hidden">
+                <div class="w-full h-full flex items-center justify-center p-3 sm:p-4 transition-transform duration-300 group-hover:scale-110"
+                    id="icon-rock"></div>
+            </button>
+            <button onmouseenter="hSfx()" onclick="playRound('paper')"
+                class="choice-btn group aspect-square rounded-2xl flex items-center justify-center p-0 text-cyan-400 shadow-xl overflow-hidden">
+                <div class="w-full h-full flex items-center justify-center p-3 sm:p-4 transition-transform duration-300 group-hover:scale-110"
+                    id="icon-paper"></div>
+            </button>
+            <button onmouseenter="hSfx()" onclick="playRound('scissors')"
+                class="choice-btn group aspect-square rounded-2xl flex items-center justify-center p-0 text-yellow-400 shadow-xl overflow-hidden">
+                <div class="w-full h-full flex items-center justify-center p-3 sm:p-4 transition-transform duration-300 group-hover:scale-110"
+                    id="icon-scissors"></div>
+            </button>
+            <button onmouseenter="hSfx()" onclick="playRound('lizard')"
+                class="choice-btn group aspect-square rounded-2xl flex items-center justify-center p-0 text-green-400 shadow-xl overflow-hidden">
+                <div class="w-full h-full flex items-center justify-center p-3 sm:p-4 transition-transform duration-300 group-hover:scale-110"
+                    id="icon-lizard"></div>
+            </button>
+            <button onmouseenter="hSfx()" onclick="playRound('spock')"
+                class="choice-btn group aspect-square rounded-2xl flex items-center justify-center p-0 text-purple-500 shadow-xl overflow-hidden">
+                <div class="w-full h-full flex items-center justify-center p-3 sm:p-4 transition-transform duration-300 group-hover:scale-110"
+                    id="icon-spock"></div>
+            </button>
+        </div>
+
+        <!-- REBOOT -->
+        <button onclick="reset()"
+            class="text-[7px] sm:text-[9px] text-cyan-600 font-bold uppercase tracking-[2em] hover:text-cyan-400 transition-all border-b border-transparent hover:border-cyan-500 pb-0.5 mt-2 shrink-0">
+            REBOOT_SYSTEM
+        </button>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="stats-modal"
+        class="fixed inset-0 bg-black/98 z-[3000] hidden flex items-center justify-center backdrop-blur-3xl p-6">
+        <div
+            class="bg-gray-900 border border-cyan-500/20 p-8 sm:p-12 rounded-[2rem] sm:rounded-[3.5rem] shadow-2xl w-full max-w-3xl text-white relative">
+            <button onclick="toggleStats()"
+                class="absolute top-6 right-6 sm:top-10 sm:right-10 text-gray-600 hover:text-cyan-400 transition-all"><svg
+                    viewBox="0 0 24 24" class="w-8 h-8 sm:w-12 sm:h-12 fill-current">
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                </svg></button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center text-center md:text-left">
+                <div class="relative w-40 h-40 sm:w-56 sm:h-56 mx-auto">
+                    <svg class="w-full h-full">
+                        <circle class="text-white/5" stroke-width="12" stroke="currentColor" fill="transparent" r="100"
+                            cx="112" cy="112" />
+                        <circle id="stat-circle" class="progress-ring__circle text-cyan-400" stroke-width="12"
+                            stroke-dasharray="628.32" stroke-dashoffset="628.32" stroke-linecap="round"
+                            stroke="currentColor" fill="transparent" r="100" cx="112" cy="112"
+                            style="filter: drop-shadow(0 0 20px #00ffff);" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center"><span id="stat-rate"
+                            class="text-4xl sm:text-5xl font-black text-cyan-400">0%</span><span
+                            class="text-[8px] sm:text-[10px] text-white/50 uppercase tracking-[0.4em] mt-2">Efficiency</span>
+                    </div>
+                </div>
+                <div class="space-y-4 sm:space-y-6">
+                <h2 class="text-4xl sm:text-5x1 font-black italic uppercase tracking-tighter" style="color: var(--neon-purple); text-shadow: 0 0 1px var(--neon-purple), 0 0 9px var(--neon-purple);">DATA_LOG</h2>
+                    <div class="grid grid-cols-2 gap-4 sm:gap-6">
+                        <div class="hud-panel p-4 sm:p-6 rounded-2xl border-r-4 border-r-cyan-400">
+                            <span class="text-[7px] sm:text-[9px] opacity-80 block text-cyan-400">TOTAL_OPS</span><span
+                                id="stat-total" class="text-2xl sm:text-3xl font-black text-cyan-400">0</span>
+                        </div>
+                        <div class="hud-panel p-4 sm:p-6 rounded-2xl border-r-4 border-r-green-500"><span
+                                class="text-[7px] sm:text-[9px] opacity-80 block text-green-400">SUCCESS</span><span
+                                id="stat-wins" class="text-2xl sm:text-3xl font-black text-green-400">0</span></div>
+                        <div class="hud-panel p-4 sm:p-6 rounded-2xl border-r-4 border-r-pink-500"><span
+                                class="text-[7px] sm:text-[9px] opacity-80 block text-pink-500">FAILURE</span><span
+                                id="stat-losses" class="text-2xl sm:text-3xl font-black text-pink-500">0</span></div>
+                        <div class="hud-panel p-4 sm:p-6 rounded-2xl border-r-4 border-r-yellow-500"><span
+                                class="text-[7px] sm:text-[9px] opacity-80 block text-yellow-500">MAX_STREAK</span><span
+                                id="stat-streak" class="text-2xl sm:text-3xl font-black text-yellow-400">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="paper.js"></script>
+</body>
+
+</html>
